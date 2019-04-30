@@ -1,0 +1,47 @@
+---
+- name: Installing packages
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Installing packages and developement tools using yum
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - wget
+        - git
+        - epel-release
+        - yum-utils
+        - "@Development tools"
+      become: yes
+    - name: Installing Python3.6  rpm from a remote repo
+      yum:
+         name: https://centos7.iuscommunity.org/ius-release.rpm
+         state: present
+      become: yes
+    - name: Installing packages using yum
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python36u
+        - python36u-pip
+        - python36u-libs
+        - python36u-devel
+        - mariadb-devel
+		- nginx
+    - name: Installing pip
+      easy_install:
+        name: pip
+        state: latest
+    - name: Installing Python3.6 dependencies with pip3.6
+      shell: pip3.6 install mysqlclient ; pip3.6 install pytz
+      become: yes
+    - name: Starting Services
+      service:
+        name: "{{ item }}"
+        state: started
+      with_items:
+        - nginx
+      become: yes
