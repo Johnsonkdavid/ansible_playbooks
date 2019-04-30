@@ -1,0 +1,25 @@
+---
+- name: Target group for ALB
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Launch configuration
+      elb_application_lb:
+        name: myelb
+        security_groups:
+          - sg-095eef877179c6a17
+        subnets:
+          - subnet-61393006
+          - subnet-8b8fb1c2
+        listeners:
+          - Protocol: HTTPS # Required. The protocol for connections from clients to the load balancer (HTTP or HTTPS) (case-sensitive).
+            Port: 443  # Required. The port on which the load balancer is listening.
+        # The security policy that defines which ciphers and protocols are supported. The default is the current predefined security policy.
+            SslPolicy: ELBSecurityPolicy-2016-08
+            Certificates: # The ARN of the certificate (only one certficate ARN should be provided)
+              - CertificateArn: arn:aws:iam::*************:server-certificate/**
+            DefaultActions:
+              - Type: forward # Required. Only 'forward' is accepted at this time
+                TargetGroupName: testtg # Required. The name of the target group
+        state: present
