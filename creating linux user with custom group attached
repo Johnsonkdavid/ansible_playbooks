@@ -1,0 +1,11 @@
+---
+- name: User creaton 
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Creating user 'jdavid' and adding into sudo group named 'Appadmin'
+      user:
+        name: username
+        state: present
+        group: groupname     ##"groupname" should be present in the control node
