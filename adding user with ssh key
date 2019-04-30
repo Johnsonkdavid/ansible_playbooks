@@ -1,0 +1,14 @@
+---
+- name: Creating a linux user
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Set authorized key in alternate location
+      authorized_key:
+        user: username
+        state: present
+        key: "{{ lookup('file', '/path/to/the/pub-key-file') }}" ##pub-key-file must present in the control node
+        path: /path/to/the/authorized_keys/file
+        manage_dir: False
+
