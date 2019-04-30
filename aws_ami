@@ -1,0 +1,17 @@
+---
+- name: Creating an aws ami of an instance 
+  hosts: local
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Create AMI
+      ec2_ami:
+          aws_accesss_key : **************************
+          aws_secret_key: *************************
+          region: **********
+          instance_id: i-********
+          name: demo    ##name of the instance 
+          wait: no
+          state: present
+      register: ami
+    - debug: msg="ami is {{ ami.stdout }}"      ## using for debugging
