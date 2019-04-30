@@ -1,0 +1,13 @@
+---
+
+- name: Editing files
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Editing file using ansible lineinfile module
+      lineinfile:
+        path: /etc/tomcat/server.xml
+        regexp: '<Connector port="8080" protocol="HTTP/1.1"'
+        line: '<Connector port="9090" protocol="HTTP/1.1"'
+
