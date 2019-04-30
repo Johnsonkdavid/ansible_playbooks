@@ -1,0 +1,30 @@
+---
+
+- name: spin up the load balancer and add the servers to it
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: setup a simple classsic load balancer
+      ec2_elb_lb:
+        name: aws-elb-ahapp
+        state: present
+        instance_ids:
+          - i-05b20c9fc90bd7153
+        region: us-east-1
+        zones:
+          - us-****-1
+        listeners:
+          - protocol: http
+            load_balancer_port: 80
+            instance_protocol: http # optional, defaults to value of protocol setting
+            instance_port: 8080
+        health_check:
+            ping_protocol: tcp # options are http, https, ssl, tcp
+            ping_port: 8080
+            response_timeout: 5 # seconds
+            interval: 30
+            unhealthy_threshold: 8
+            healthy_threshold: 10
+
+
