@@ -1,0 +1,111 @@
+---
+- name: configuring aws autoscaling  
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Launch configuration
+      ec2_lc:
+        aws_access_key: ********************************
+        aws_secret_key: *******************************
+        name: testlc
+        image_id: ami-****
+        key_name: your-key-name
+        security_groups: ['sg-*****']
+        instance_type: t2.micro
+        instance_tags:
+          Name: ah-ec2
+          Env: dev
+          App: ah-app
+        user_data: "{{ lookup('file', 'file.sh') }}"      ##file.sh is a shell script which act as "user data" and it should present where the playbook exist.
+        volumes:
+          - device_name: /dev/sda1
+            volume_size: 8
+            volume_type: gp2
+            iops: 100
+
+
+    - name: Configure Auto Scaling Group and perform rolling deploy
+      ec2_asg:
+        region: ap-******
+        name: demo
+        launch_config_name: testlc
+        availability_zones: ap-*****-1
+        health_check_type: ELB
+        health_check_period: 300
+        desired_capacity: 1
+        min_size: 1
+        max_size: 2
+        load_balancers:
+          - aws-elb-ahapp
+        state: present
+        wait_for_instances : no
+      register: asg_result
+
+    - name: Configure Scaling Policies
+      ec2_scaling_policy:
+        region: ap-*****-1
+        name: "{{ item.name }}"
+        asg_name: demo
+        state: present
+        adjustment_type: "{{ item.adjustment_type }}"
+        min_adjustment_step: "{{ item.min_adjustment_step }}"
+        scaling_adjustment: "{{ item.scaling_adjustment }}"
+        cooldown: "{{ item.cooldown }}"
+      with_items:
+        - name: "Increase Group Size"
+          adjustment_type: "ChangeInCapacity"
+          scaling_adjustment: +1
+          min_adjustment_step: 1
+          cooldown: 180
+        - name: "Decrease Group Size"
+          adjustment_type: "ChangeInCapacity"
+          scaling_adjustment: -1
+          min_adjustment_step: 1
+          cooldown: 300
+      register: sp_result
+
+    - name: Determine Metric Alarm configuration
+      set_fact:
+        metric_alarms:
+          - name: demoScaleUp
+            comparison: ">="
+            threshold: 75.0
+            alarm_actions:
+              - "{{ sp_result.results[0].arn }}"
+
+          - name: demoScaleDown
+            comparison: "<="
+            threshold: 40.0
+            alarm_actions:
+              - "{{ sp_result.results[1].arn }}"
+
+    - name: Configure Metric Alarms and link to Scaling Policies
+      ec2_metric_alarm:
+        region: ap-southeast-1
+        name: "{{ item.name }}"
+        state: present
+        metric: "CPUUtilization"
+        namespace: "AWS/EC2"
+        statistic: "Average"
+        comparison: "{{ item.comparison }}"
+        threshold: "{{ item.threshold }}"
+        period: 60
+        evaluation_periods: 5
+        unit: "Percent"
+        dimensions:
+          AutoScalingGroupName: demo
+        alarm_actions: "{{ item.alarm_actions }}"
+      with_items:
+        - name: demoScaleUp
+          comparison: ">="
+          threshold: 75.0
+          alarm_actions:
+            - "{{ sp_result.results[0].arn }}"
+
+        - name: demoScaleDown
+          comparison: "<="
+          threshold: 40.0
+          alarm_actions:
+            - "{{ sp_result.results[1].arn }}"
+      register: ma_result
