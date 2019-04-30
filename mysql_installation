@@ -1,0 +1,22 @@
+   - name: Installing MySql from repo
+      get_url:
+        url: http://dev.mysql.com/get/mysql57-community-release-el7-9.noarch.rpm
+        dest: /home/centos
+      become: yes
+    - name: Install the MYSQL rpm
+      yum:
+        name: /home/centos/mysql57-community-release-el7-9.noarch.rpm
+        state: present
+      become: yes
+    - name: Install the latest version of Mysql
+      yum:
+        name: mysql
+        state: latest
+      become: yes
+     - name: Service Starting
+      service:
+        name: "{{ item }}"
+        state: started
+      with_items:
+       - mysqld
+      become: yes
