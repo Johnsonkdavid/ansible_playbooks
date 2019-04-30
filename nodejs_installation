@@ -1,0 +1,21 @@
+---
+- name: Installing Nodejs Version 10.x
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Adding NodeSource yum repository to /tmp directory.
+      get_url:
+        url:  https://rpm.nodesource.com/setup_10.x
+        dest: /tmp
+      become: yes
+    - name: Executing setup file
+      shell: bash /tmp/setup_10.x
+      become: yes
+    - name: Installing Nodejs V 10.x using yum command.
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - nodejs
+      become: yes
