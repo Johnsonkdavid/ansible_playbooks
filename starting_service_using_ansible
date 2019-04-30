@@ -1,0 +1,13 @@
+   - name: Service Starting
+      service:
+        name: "{{ item }}"
+        state: started
+      with_items:
+        - service1
+        - service2
+        .
+        .
+        .
+        .
+        - service n
+      become: yes
