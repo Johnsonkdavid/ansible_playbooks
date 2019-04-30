@@ -8,10 +8,10 @@
       elb_application_lb:
         name: myelb
         security_groups:
-          - sg-095eef877179c6a17
+          - sg-******
         subnets:
-          - subnet-61393006
-          - subnet-8b8fb1c2
+          - subnet-****
+          - subnet-****
         listeners:
           - Protocol: HTTPS # Required. The protocol for connections from clients to the load balancer (HTTP or HTTPS) (case-sensitive).
             Port: 443  # Required. The port on which the load balancer is listening.
