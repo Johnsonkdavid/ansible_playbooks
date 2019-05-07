@@ -1,2 +1,4 @@
 # ansible_playbooks
-This is a repo which contains some useful ansible tasks which we can done in linux machine
+This is a repo which contains some useful ansible playbooks which we can excute in linux machines
+
+Have fun with ANSIBLE 
