@@ -46,3 +46,6 @@ ec2.yml
 - Run your playbook by this command, 'ansible-playbook playbookfile.yml --ask-vault-pass'
 - Enter the password for vaultfile we created.
 - That's it, done!!!!!
+
+ 
+For more about ansible vault : 👉 https://docs.ansible.com/ansible/latest/user_guide/vault.html
