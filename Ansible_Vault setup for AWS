@@ -1,0 +1,48 @@
+Ansible Vault for AWS Credentials.
+
+- Create a vault credentials file  named filename.yml using the command 'ansible-vault create filename.yml'
+- Enter a password for the vaultfile we created
+- Don't forgot to note down the password, we need the password to run our playbook file
+
+- Insert AWS Credentials into the file.The file be like;
+	---
+	VAULT_AWS_ACCESS_KEY:  theAwsAccessKey
+	VAULT_AWS_SECRET_KEY:  theAwsSecretKey
+
+- Inside the playbook add the 'vars_file' attribute and add the path of credentials file (filename.yml)
+  (For demo purpose here I'm using an ec2 module for launching a new EC2 instance.)
+   
+ec2.yml
+---
+- name: Connection Establishment
+  hosts: defaults
+  gather_facts: true
+  connection: local
+  vars_files:
+    - filename.yml                                           -------------------> give the full path to your credentials file          
+  tasks:
+    - name: Spinning a new EC2 instance.
+      ec2:
+        aws_access_key: '{{ VAULT_AWS_ACCESS_KEY }}'         -------------------> same varible which we mentioned inside filename.yml
+        aws_secret_key: '{{ VAULT_AWS_SECRET_KEY }}'         -------------------> same varible which we mentioned inside filename.yml
+        key_name: johnson-docker
+        instance_type: t2.micro
+        image: ami-********
+        wait: yes
+        group_id: sg-********
+        region: us-east-1
+        exact_count: 1
+        vpc_subnet_id: subnet-******
+        count_tag:
+          docker-registry: 1
+        instance_profile_name: (Rolename)
+        user_data: "{{ lookup('file', 'userdata.sh') }}"
+        instance_tags:
+          Name: ECS_docker-registry
+          docker-registry: 1
+        assign_public_ip: yes
+      register: ec2
+
+- Run your playbook by this command, 'ansible-playbook playbookfile.yml --ask-vault-pass'
+- Enter the password for vaultfile we created.
+- That's it, done!!!!!
