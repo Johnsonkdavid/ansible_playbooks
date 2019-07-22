@@ -1,0 +1,9 @@
+Having multiple ansible.cfg creates confusion that which one will get use, this is a genuine questio.
+here is the precedence ordering starting from top to bottom.
+
+👉 $ANSIBLE_CONFIG   Setting environment variable for the location of ansible configuration file.
+👉 Using ./ansible.cfg   from the current directory which is used to run the ansible playbook or adhoc command
+👉 ~/.ansible.cfg   file present in home directory of user which is use to run the ansible command.
+👉 /etc/ansible/ansible.cfg  default ansible.cfg file.
+IMP : Ansible will only use the configuration settings from the file which is found in this sequence first,
+it will not look for the settings in the higher sequence files if the setting is not present in the file which is chosen for deployment.
