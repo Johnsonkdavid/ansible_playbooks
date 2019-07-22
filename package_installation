@@ -30,7 +30,7 @@
         - python36u-libs
         - python36u-devel
         - mariadb-devel
-		- nginx
+	- nginx
     - name: Installing pip
       easy_install:
         name: pip
