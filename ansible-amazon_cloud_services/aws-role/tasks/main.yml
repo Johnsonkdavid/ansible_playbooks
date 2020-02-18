@@ -1,0 +1,7 @@
+---
+# tasks file for aws_role
+#- include_tasks: ec2.yml
+- include_vars:
+    file: creds.yml
+- include_tasks: ec2.yml
+
